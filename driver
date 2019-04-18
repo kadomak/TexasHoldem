@@ -1,0 +1,102 @@
+#include <cstdlib>
+#include <ctime>
+#include "deck.h"
+#include "dealer.h"
+#include "player.h"
+#include "floor.h"
+#include "cards.h"
+
+int main()
+{
+    srand(time(NULL)); //allows for new results each time
+    int response, bet, response2;  
+    vector<string> hand, floorCards;
+    
+    cout << string(70,'*') << "\nWelcome to Texas Hold'em! \n\n";
+    cout << "In this game you will play against the computer, Player 2." << endl;
+    cout << "The rules for this variation are simple. \nWith each turn you must place a bet." << endl;
+    cout << "The minimum betting amount, or call, for this game is $50" <<endl
+    << string(70,'*') << endl; 
+    
+    
+    //creating players, deck,dealer, and board
+    player Player1, Player2;
+    dealer Jim; //the dealer is named Jim
+    floor Board;
+    
+    cout << "\n*The cards are being shuffled and given to each player*\n" << endl;
+    Jim.shuffleCards(); //shuffles cards
+   
+    hand = Jim.dealCards(2); //the cards dealt are called 'hand'
+    Player1.getHand(hand); //player 1 receives their cards
+    
+    
+    hand = Jim.dealCards(3); // flop
+    Board.addToCardDisplay(hand); //cards are placed on board but not turned
+    cout << "The cards on the floor are: ";
+    Board.showCardDisplay(); //cards are turned over
+    
+   
+    hand = Jim.dealCards(2); //cards are drawn
+    Player2.getHand(hand); //player 2 receives their cards
+    cout << endl << "Here are your cards, Player 1: ";
+    Player1.showHand(); //player 1 looks at their cards
+    Player1.setCallAmount(50); //sets the call to 50 
+    
+    for (int i =0; i < 2; i++)
+    {
+        cout << "\nChoose 1. to raise or 2. to call: "; //allows player 1 to raise or call
+        cin >> response;
+        
+        if (response == 1) //player 1 raises
+        {
+            cout << "Enter the amount to bet: $";
+            cin >> bet;
+            bet = Player1.raise(bet);
+        }
+        
+        else if (response == 2) //player 1 calls
+            bet = Player1.call();
+        
+        Board.setPot(bet); // increases the amount in the pot
+        cout << "\nThe amount in the pot is: $"<< Board.getPot(); //displays amount for grabs
+        
+        cout << "\nPlayer 2's turn" << endl; 
+        response2 = rand() % 2 + 1; //randomly chooses to either raise the stakes or call
+        if (response2 == 1) //player 2 raises the stakes
+        {
+            cout << "\nPlayer 2 decided to raise the stakes.";
+            bet = rand() % 1000 + 50;
+            bet = Player2.raise(bet);
+        }
+        
+        else if (response2 == 2) //player 2 calls
+        {
+            cout << "\nPlayer 2 decided to call";
+            bet = Player2.call();
+        }
+        
+        Board.setPot(bet); //increases the amount in the pot
+        cout << "\nThe amount in the pot is: $"<< Board.getPot(); //displays the amount for grabs
+       
+        
+        hand = Jim.dealCards(1); //draws an additional card after betting
+        Board.addToCardDisplay(hand); //places card on the floor
+        cout << "\nThe cards on the floor are: ";
+        Board.showCardDisplay(); //flips over the new card 
+    } 
+    
+    //after betting is finalized displays player 2's cards
+   /* cout << "\nPlayer 2s cards are: ";
+    Player2.showHand();
+    cout << "\nYour cards are: ";
+    Player1.showHand();
+    
+    //determing winner
+    floorCards = Board.getCardDisplay();
+    /*cout << "\n\nPlayer 1 has: " << Player1.handType(floorCards);
+    cout<< "\nPlayer 2 has: " << Player2.handType(floorCards);
+    cout << endl; */
+    
+        
+}
